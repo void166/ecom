@@ -1,0 +1,4 @@
+import Link from 'next/link';
+import { Button } from '@commerce/ui';
+import { CheckCircle2 } from 'lucide-react';
+export default async function SuccessPage({ searchParams }: { searchParams: Promise<{ order?: string }> }) { const { order } = await searchParams; return <div className="mx-auto max-w-xl px-5 py-24 text-center"><CheckCircle2 className="mx-auto size-14 text-emerald-700"/><p className="mt-7 text-xs font-bold uppercase tracking-[.2em] text-neutral-500">Order received</p><h1 className="display mt-3 text-5xl">Thank you.</h1><p className="mt-5 leading-7 text-neutral-600">Your order {order ? <strong>{order}</strong> : ''} is awaiting payment confirmation. We’ll send updates as it moves forward.</p><Button asChild className="mt-8"><Link href="/products">Continue shopping</Link></Button></div>; }

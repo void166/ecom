@@ -1,0 +1,9 @@
+'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@commerce/ui';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { api } from '@/lib/api';
+const schema = z.object({ firstName: z.string().min(1), lastName: z.string().min(1), email: z.string().email(), password: z.string().min(8) });
+export default function RegisterPage() { const router = useRouter(); const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) }); const submit = form.handleSubmit(async (values) => { try { const session = await api<{ accessToken: string; refreshToken: string }>('/auth/register', { method: 'POST', body: JSON.stringify(values) }); localStorage.setItem('commerce-access-token', session.accessToken); localStorage.setItem('commerce-refresh-token', session.refreshToken); router.push('/account'); } catch (error) { form.setError('root', { message: error instanceof Error ? error.message : 'Registration failed' }); } }); return <div className="mx-auto max-w-md px-5 py-20"><h1 className="display text-5xl">Create account</h1><form onSubmit={submit} className="mt-9 grid gap-5 sm:grid-cols-2">{(['firstName','lastName','email','password'] as const).map((name) => <label key={name} className={name === 'email' || name === 'password' ? 'sm:col-span-2' : ''}><span className="mb-2 block text-sm font-semibold">{{ firstName: 'First name', lastName: 'Last name', email: 'Email', password: 'Password' }[name]}</span><input {...form.register(name)} type={name === 'password' ? 'password' : name === 'email' ? 'email' : 'text'} className="h-12 w-full rounded-lg border px-4"/></label>)}{form.formState.errors.root && <p className="text-sm text-red-700 sm:col-span-2">{form.formState.errors.root.message}</p>}<Button type="submit" size="lg" className="sm:col-span-2">Create account</Button></form></div>; }

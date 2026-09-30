@@ -1,0 +1,9 @@
+'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Card, CardContent } from '@commerce/ui';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { api } from '@/lib/api';
+const schema = z.object({ email: z.string().email(), password: z.string().min(8) });
+export default function LoginPage() { const router = useRouter(); const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { email: 'admin@example.com', password: 'ChangeMe123!' } }); const submit = form.handleSubmit(async (values) => { try { const session = await api<{ accessToken: string; refreshToken: string }>('/auth/login', { method: 'POST', body: JSON.stringify(values) }); localStorage.setItem('backoffice-access-token', session.accessToken); localStorage.setItem('backoffice-refresh-token', session.refreshToken); router.push('/'); } catch (error) { form.setError('root', { message: error instanceof Error ? error.message : 'Sign in failed' }); } }); return <div className="mx-auto max-w-md py-12"><Card><CardContent className="p-8"><h1 className="text-2xl font-bold">Staff sign in</h1><p className="mt-2 text-sm text-neutral-500">Use the seeded development account, then rotate it.</p><form onSubmit={submit} className="mt-7 grid gap-5"><label><span className="mb-2 block text-sm font-semibold">Email</span><input {...form.register('email')} className="h-11 w-full rounded-lg border px-3"/></label><label><span className="mb-2 block text-sm font-semibold">Password</span><input {...form.register('password')} type="password" className="h-11 w-full rounded-lg border px-3"/></label>{form.formState.errors.root && <p className="text-sm text-red-600">{form.formState.errors.root.message}</p>}<Button type="submit">Sign in</Button></form></CardContent></Card></div>; }

@@ -1,0 +1,1 @@
+export default function Loading() { return <div className="mx-auto max-w-7xl animate-pulse px-5 py-12"><div className="h-14 w-72 bg-black/10"/><div className="mt-16 grid grid-cols-2 gap-5 lg:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="aspect-[4/5] bg-black/10"/>)}</div></div>; }
